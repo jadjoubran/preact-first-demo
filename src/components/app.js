@@ -5,7 +5,6 @@ import Header from './header';
 import Home from './home';
 import Profile from './profile';
 import NewTrip from './new-trip';
-import Trips from './trips';
 
 export default class App extends Component {
 	/** Gets fired when the route changes.
