@@ -24,7 +24,6 @@ export default class App extends Component {
 					<Profile path="/profile/" user="me" />
 					<Profile path="/profile/:user" />
 					<NewTrip path="/new-trip" />
-					<Trips path="/trips" />
 				</Router>
 			</div>
 		);
