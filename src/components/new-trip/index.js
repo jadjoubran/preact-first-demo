@@ -1,28 +1,50 @@
 import { h, Component } from 'preact';
+import { route } from 'preact-router';
 import style from './style';
+import LibLoader from './../../lib/lib-loader';
 
 export default class NewTrip extends Component {
 
-	newTrip(event){
+	newTrip(event) {
 		event.preventDefault();
-		let value = document.getElementById('trip-name').value;
 
-		if (!value){
+		if (!window.firebase || !window.firebase.database) {
 			return false;
 		}
 
-		let trips = window.localStorage.getItem('trips') || "[]";
+		let value = document.getElementById('trip-name').value;
 
-		trips = JSON.parse(trips);
-		trips.push({name: value});
-		window.localStorage.setItem('trips', JSON.stringify(trips));
-		window.location.href = "/";
+		if (!value) {
+			return false;
+		}
+
+		if (LibLoader.isFireBaseReady()) {
+			this.save();
+		} else {
+			setInterval(() => {
+				if (LibLoader.isFireBaseReady()) {
+					console.log('ready');
+					this.save();
+				}
+			}, 500);
+		}
+	}
+
+	save() {
+		let value = document.getElementById('trip-name').value;
+		firebase.database().ref('trips').once('value').then((response) => {
+			let trips = response.val() || [];
+			trips.push({ name: value });
+			firebase.database().ref('trips').set(trips);
+			window.localStorage.setItem('has_trips', true);
+			route('/');
+		});
 	}
 
 	render() {
-		return (<form onSubmit={this.newTrip}>
+		return (<form onSubmit={this.newTrip.bind(this)}>
 			<input type="text" id="trip-name" class={style.newTrip} placeholder="Trip destination" />
-			<input type="submit" style="opacity:0;"/>
+			<input type="submit" style="opacity:0;" />
 		</form>);
 	}
 }
